@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marketing Dashboard Presentation – Azhar Amirul Abid</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:    #0A1F5C;
+    --navy2:   #0D2778;
+    --blue:    #1A3A9C;
+    --accent:  #F5A623;
+    --gold:    #E8960A;
+    --light:   #E8ECF8;
+    --white:   #FFFFFF;
+    --gray:    #8896B3;
+    --bg-card: rgba(255,255,255,0.07);
+    --border:  rgba(255,255,255,0.12);
+    --slide-w: 100vw;
+    --slide-h: 100vh;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--navy);
+    color: var(--white);
+    overflow: hidden;
+    height: 100vh; width: 100vw;
+  }
+
+  /* ── SLIDE ENGINE ── */
+  .deck { width: 100%; height: 100%; position: relative; }
+
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    opacity: 0; pointer-events: none;
+    transition: opacity .5s ease, transform .5s ease;
+    transform: translateY(24px);
+    overflow: hidden;
+  }
+  .slide.active {
+    opacity: 1; pointer-events: all; transform: translateY(0);
+  }
+
+  /* ── DARK SLIDES ── */
+  .dark { background: linear-gradient(135deg, #0A1F5C 0%, #0D2778 60%, #0F2E8A 100%); }
+  /* ── LIGHT SLIDES ── */
+  .light { background: linear-gradient(135deg, #EEF1FA 0%, #E4E9F7 100%); color: var(--navy); }
+  .light .tag { background: var(--navy); color: var(--white); }
+  .light h2 { color: var(--navy); }
+  .light .sub { color: #4A5A8A; }
+
+  /* ── DECORATIVE GRID ── */
+  .grid-lines {
+    position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .circle-deco {
+    position: absolute; border-radius: 50%; pointer-events: none;
+  }
+
+  /* ── NAV ── */
+  .nav {
+    position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
+    z-index: 999; display: flex; align-items: center; gap: 16px;
+    background: rgba(10,31,92,0.85); backdrop-filter: blur(12px);
+    border: 1px solid var(--border); border-radius: 50px;
+    padding: 10px 24px;
+  }
+  .nav button {
+    background: none; border: none; color: var(--white);
+    font-size: 18px; cursor: pointer; padding: 6px 10px;
+    border-radius: 8px; transition: background .2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .nav button:hover { background: rgba(255,255,255,0.1); }
+  .nav .counter {
+    font-family: 'Syne', sans-serif; font-size: 13px; color: var(--gray);
+    min-width: 60px; text-align: center; letter-spacing: 1px;
+  }
+  .dots { display: flex; gap: 6px; align-items: center; }
+  .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--gray); cursor: pointer; transition: all .25s;
+  }
+  .dot.on { background: var(--accent); transform: scale(1.35); }
+
+  /* ── PROGRESS BAR ── */
+  .progress {
+    position: fixed; top: 0; left: 0; height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--gold));
+    transition: width .4s ease; z-index: 9999;
+  }
+
+  /* ── SHARED LAYOUT ── */
+  .slide-inner {
+    flex: 1; display: flex; flex-direction: column;
+    padding: 56px 72px 80px; position: relative; z-index: 1;
+  }
+  .slide-inner.center { justify-content: center; align-items: center; text-align: center; }
+
+  .tag {
+    display: inline-block;
+    background: var(--accent); color: var(--navy);
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+    padding: 5px 14px; border-radius: 4px; margin-bottom: 20px;
+  }
+  h1 { font-family: 'Syne', sans-serif; font-weight: 800; line-height: 1.05; }
+  h2 { font-family: 'Syne', sans-serif; font-weight: 700; }
+  h3 { font-family: 'Syne', sans-serif; font-weight: 700; }
+
+  .kicker {
+    font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 600;
+    letter-spacing: 3px; text-transform: uppercase; color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  .footer-bar {
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent) 0%, transparent 100%);
+    position: absolute; bottom: 0; left: 0; right: 0;
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px 28px; backdrop-filter: blur(8px);
+  }
+  .card-light {
+    background: rgba(10,31,92,0.06); border: 1px solid rgba(10,31,92,0.1);
+    border-radius: 16px; padding: 24px 28px;
+  }
+
+  /* ── GRID HELPERS ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+
+  /* ── DIVIDER ── */
+  .divider {
+    width: 48px; height: 3px; border-radius: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--gold));
+    margin: 14px 0 22px;
+  }
+
+  /* ── ICON BOX ── */
+  .icon-box {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: rgba(245,166,35,0.15); display: flex; align-items: center;
+    justify-content: center; font-size: 22px; margin-bottom: 14px;
+    flex-shrink: 0;
+  }
+
+  /* ── STEP ROW ── */
+  .step-row {
+    display: flex; align-items: flex-start; gap: 16px; padding: 14px 20px;
+    background: var(--bg-card); border-radius: 12px;
+    border-left: 3px solid var(--accent);
+    margin-bottom: 10px; transition: background .2s;
+  }
+  .step-row:hover { background: rgba(255,255,255,0.1); }
+  .step-num {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 26px;
+    color: var(--accent); line-height: 1; flex-shrink: 0; width: 36px;
+  }
+
+  /* ── TABLE OF CONTENTS ── */
+  .toc-item {
+    display: flex; align-items: center; gap: 18px;
+    padding: 14px 20px; border-bottom: 1px solid var(--border);
+    transition: background .2s; cursor: default;
+  }
+  .toc-item:last-child { border-bottom: none; }
+  .toc-item:hover { background: rgba(255,255,255,0.05); border-radius: 10px; }
+  .toc-num {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 20px; color: var(--accent); width: 36px; flex-shrink: 0;
+  }
+  .toc-title { font-size: 14px; font-weight: 500; color: var(--light); }
+
+  /* ── SMART ── */
+  .smart-item {
+    padding: 18px 22px; background: var(--bg-card);
+    border-radius: 14px; border: 1px solid var(--border);
+    position: relative; overflow: hidden;
+  }
+  .smart-letter {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 40px; color: var(--accent); opacity: .15;
+    position: absolute; right: 12px; bottom: 4px; line-height: 1;
+  }
+  .smart-label {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 6px;
+  }
+
+  /* ── METRIC CARDS ── */
+  .metric { text-align: center; padding: 20px 16px; }
+  .metric-val {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 36px; color: var(--accent); margin-bottom: 4px;
+  }
+  .metric-lbl { font-size: 12px; color: var(--gray); letter-spacing: 1px; text-transform: uppercase; }
+
+  /* ── CHALLENGE ── */
+  .challenge-item {
+    display: flex; gap: 16px; align-items: flex-start;
+    padding: 16px 20px; border-radius: 12px;
+    background: rgba(255,60,60,0.07); border: 1px solid rgba(255,80,80,0.15);
+    margin-bottom: 12px;
+  }
+  .response-item {
+    display: flex; gap: 16px; align-items: flex-start;
+    padding: 16px 20px; border-radius: 12px;
+    background: rgba(60,200,120,0.07); border: 1px solid rgba(60,200,120,0.15);
+    margin-bottom: 12px;
+  }
+
+  /* ── TIMELINE ── */
+  .timeline { position: relative; padding-left: 32px; }
+  .timeline::before {
+    content: ''; position: absolute; left: 9px; top: 8px; bottom: 8px;
+    width: 2px; background: var(--border);
+  }
+  .t-item { position: relative; margin-bottom: 22px; }
+  .t-dot {
+    position: absolute; left: -27px; top: 6px;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--accent); border: 2px solid var(--navy);
+  }
+  .t-year {
+    font-family: 'Syne', sans-serif; font-size: 12px;
+    font-weight: 700; color: var(--accent); letter-spacing: 1px; margin-bottom: 4px;
+  }
+
+  /* ── PILLS ── */
+  .pill {
+    display: inline-block; padding: 4px 12px; border-radius: 20px;
+    font-size: 11px; font-weight: 600; letter-spacing: .5px;
+    background: rgba(245,166,35,0.15); color: var(--accent);
+    border: 1px solid rgba(245,166,35,0.3); margin: 3px;
+  }
+
+  /* ── CHART MOCK ── */
+  .chart-bar-wrap { display: flex; align-items: flex-end; gap: 8px; height: 90px; }
+  .bar-seg { border-radius: 6px 6px 0 0; flex: 1; transition: height .4s; }
+
+  /* ─────────────── SLIDES ─────────────── */
+
+  /* SLIDE 1 – COVER */
+  #s1 .hero-title {
+    font-size: clamp(50px, 7vw, 90px); font-family: 'Syne', sans-serif;
+    font-weight: 800; line-height: 1.0; color: var(--white);
+    text-shadow: 0 4px 40px rgba(0,0,0,0.3);
+  }
+  #s1 .hero-title span { color: var(--accent); }
+  #s1 .presented { font-size: 15px; color: var(--light); margin-top: 32px; }
+  #s1 .big-circle {
+    width: 600px; height: 600px; right: -150px; top: -180px;
+    background: radial-gradient(circle, rgba(26,58,156,0.8) 0%, transparent 70%);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  #s1 .small-circle {
+    width: 220px; height: 220px; right: 200px; top: 40px;
+    border: 1px solid rgba(255,255,255,0.06);
+    background: transparent;
+  }
+  .chart-preview {
+    position: absolute; right: 72px; top: 50%; transform: translateY(-50%);
+    display: flex; flex-direction: column; gap: 24px;
+  }
+  .mini-card {
+    background: rgba(255,255,255,0.08); border: 1px solid var(--border);
+    border-radius: 16px; padding: 18px 22px; backdrop-filter: blur(12px);
+    min-width: 260px;
+  }
+  .mini-card-title { font-size: 11px; color: var(--gray); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
+  .line-chart { position: relative; height: 64px; }
+  .line-chart svg { width: 100%; height: 100%; overflow: visible; }
+
+  /* SLIDE 2 – TABLE OF CONTENTS */
+
+  /* SLIDE 3 – ABOUT POWER BI */
+  .powerbi-logo { font-size: 64px; margin-bottom: 8px; }
+  .feature-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-top: 24px; }
+  .feature-item {
+    padding: 20px 18px; background: var(--bg-card);
+    border: 1px solid var(--border); border-radius: 14px;
+  }
+
+  /* SLIDE 6 – BACKGROUND */
+  .stat-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-top: 32px; }
+  .stat-card {
+    text-align: center; padding: 22px 14px;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 16px;
+  }
+
+  /* Keyboard hint */
+  .key-hint {
+    position: fixed; top: 20px; right: 24px;
+    font-size: 11px; color: var(--gray); z-index: 999;
+    background: rgba(10,31,92,0.7); padding: 6px 12px;
+    border-radius: 8px; backdrop-filter: blur(6px);
+    border: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+<div class="key-hint">← → Arrow Keys to Navigate</div>
+
+<div class="deck" id="deck">
+
+  <!-- ═══════════════════════════════════════════
+       SLIDE 1 — COVER
+  ════════════════════════════════════════════ -->
+  <div class="slide dark active" id="s1">
+    <div class="grid-lines"></div>
+    <div class="circle-deco big-circle"></div>
+    <div class="circle-deco small-circle"></div>
+
+    <div class="slide-inner" style="justify-content:center; max-width:60%;">
+      <div class="kicker">2026 · Internship Final Project</div>
+      <h1 class="hero-title">
+        Marketing<br><span>Dashboard</span><br>Presentation
+      </h1>
+      <div class="presented">
+        Presented by <strong style="color:var(--accent);">Azhar Amirul Abid</strong><br>
+        <span style="color:var(--gray); font-size:13px;">Data Process / Business Intelligence Analyst</span>
+      </div>
+      <div style="display:flex; gap:12px; margin-top:36px; flex-wrap:wrap;">
+        <div class="pill">Power BI</div>
+        <div class="pill">Power Query</div>
+        <div class="pill">DAX</div>
+        <div class="pill">Data Automation</div>
+        <div class="pill">Business Intelligence</div>
+      </div>
+    </div>
+
+    <!-- Mini chart preview -->
+    <div class="chart-preview">
+      <div class="mini-card">
+        <div class="mini-card-title">Value USD — Trend 2021–2025</div>
+        <div class="line-chart">
+          <svg viewBox="0 0 240 60" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="lg1" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#F5A623" stop-opacity=".35"/>
+                <stop offset="100%" stop-color="#F5A623" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d="M0 50 C40 48,60 38,90 30 C120 22,150 15,180 8 C200 4,220 3,240 2" fill="none" stroke="#F5A623" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M0 50 C40 48,60 38,90 30 C120 22,150 15,180 8 C200 4,220 3,240 2 L240 60 L0 60 Z" fill="url(#lg1)"/>
+          </svg>
+        </div>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-title">Monthly Volume — PTA / PX</div>
+        <div class="chart-bar-wrap">
+          <div class="bar-seg" style="height:55%; background:rgba(26,58,156,0.8);"></div>
+          <div class="bar-seg" style="height:75%; background:rgba(245,166,35,0.7);"></div>
+          <div class="bar-seg" style="height:65%; background:rgba(26,58,156,0.8);"></div>
+          <div class="bar-seg" style="height:90%; background:rgba(245,166,35,0.9);"></div>
+          <div class="bar-seg" style="height:80%; background:rgba(26,58,156,0.8);"></div>
+          <div class="bar-seg" style="height:55%; background:rgba(245,166,35,0.6);"></div>
+          <div class="bar-seg" style="height:70%; background:rgba(26,58,156,0.8);"></div>
+          <div class="bar-seg" style="height:85%; background:rgba(245,166,35,0.8);"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bar"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SLIDE 2 — TABLE OF CONTENTS
+  ════════════════════════════════════════════ -->
+  <div class="slide dark" id="s2">
+    <div class="grid-lines"></div>
+    <div class="slide-inner">
+      <div class="kicker">Overview</div>
+      <h2 style="font-size:36px; margin-bottom:32px;">Table of <span style="color:var(--accent);">Content</span></h2>
+
+      <div class="grid-2" style="gap:0;">
+        <div>
+          <div class="toc-item">
+            <span class="toc-num">01</span>
+            <span class="toc-title">About Power BI</span>
+          </div>
+          <div class="toc-item">
+            <span class="toc-num">02</span>
+            <span class="toc-title">About Marketing — Vision & Mission</span>
+          </div>
+          <div class="toc-item">
+            <span class="toc-num">03</span>
+            <span class="toc-title">My Tasks — Data Analyst Role</span>
+          </div>
+          <div class="toc-item">
+            <span class="toc-num">04</span>
+            <span class="toc-title">Background — Why Power BI?</span>
+          </div>
+          <div class="toc-item">
+            <span class="toc-num">05</span>
+            <span class="toc-title">SMART Process in Dashboard Development</span>
+          </div>
+          <div class="toc-item" style="border-bottom:none;">
+            <span class="toc-num">06</span>
+            <span class="toc-title">Dashboard Development Flow</span>
+          </div>
+        </div>
+        <div style="border-left: 1px solid var(--border); padding-left:0;">
+          <div class="toc-item">
+            <span class="toc-num">07</span>
+            <span class="toc-title">Dashboard: Executive Overall (PTA/PX)</span>
+          </div>
+          <div class="toc-item">
+            <span class="toc-num">08</span>
+            <span class="toc-title">Dashboard: EXIM — Export & Import</span>
+          </div>
+          <div class="toc-item">
+            <span class="toc-num">09</span>
+            <span class="toc-title">Dashboard: Daily Pricing Monitor</span>
+          </div>
+          <div class="toc-item">
+            <span class="toc-num">10</span>
+            <span class="toc-title">Challenge & Response</span>
+          </div>
+          <div class="toc-item">
+            <span class="toc-num">11</span>
+            <span class="toc-title">Target & Plan</span>
+          </div>
+          <div class="toc-item" style="border-bottom:none;">
+            <span class="toc-num">12</span>
+            <span class="toc-title">Recommendation</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bar"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SLIDE 3 — ABOUT POWER BI
+  ════════════════════════════════════════════ -->
+  <div class="slide dark" id="s3">
+    <div class="grid-lines"></div>
+    <div class="slide-inner">
+      <div class="kicker">Section 01</div>
+      <div style="display:flex; align-items:center; gap:20px; margin-bottom:6px;">
+        <div style="font-size:52px; line-height:1;">📊</div>
+        <h2 style="font-size:38px;">About <span style="color:var(--accent);">Power BI</span></h2>
+      </div>
+      <div class="divider"></div>
+
+      <div class="grid-2" style="gap:28px;">
+        <div>
+          <h3 style="font-size:15px; color:var(--accent); letter-spacing:1px; text-transform:uppercase; margin-bottom:10px;">Definition</h3>
+          <p style="font-size:14px; line-height:1.7; color:var(--light);">
+            Power BI is Microsoft's Business Intelligence (BI) platform used to collect, process, analyze, and visualize data from multiple sources into interactive reports and dashboards — enabling faster, data-driven decision-making across all business functions.
+          </p>
+          <div style="margin-top:20px;">
+            <h3 style="font-size:15px; color:var(--accent); letter-spacing:1px; text-transform:uppercase; margin-bottom:12px;">Core Components</h3>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <div style="display:flex; align-items:center; gap:12px; padding:10px 14px; background:var(--bg-card); border-radius:10px;">
+                <span style="font-size:18px;">🔗</span>
+                <div><strong style="font-size:13px;">Power Query</strong><br><span style="font-size:12px; color:var(--gray);">Data extraction, transformation & loading (ETL)</span></div>
+              </div>
+              <div style="display:flex; align-items:center; gap:12px; padding:10px 14px; background:var(--bg-card); border-radius:10px;">
+                <span style="font-size:18px;">🧮</span>
+                <div><strong style="font-size:13px;">DAX (Data Analysis Expressions)</strong><br><span style="font-size:12px; color:var(--gray);">Custom calculations, KPIs, and measures</span></div>
+              </div>
+              <div style="display:flex; align-items:center; gap:12px; padding:10px 14px; background:var(--bg-card); border-radius:10px;">
+                <span style="font-size:18px;">📈</span>
+                <div><strong style="font-size:13px;">Power BI Service</strong><br><span style="font-size:12px; color:var(--gray);">Cloud publishing, sharing & automated refresh</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <h3 style="font-size:15px; color:var(--accent); letter-spacing:1px; text-transform:uppercase; margin-bottom:12px;">Objectives in This Project</h3>
+          <div class="feature-grid" style="grid-template-columns:1fr 1fr; gap:12px; margin-top:0;">
+            <div class="feature-item">
+              <div style="font-size:26px; margin-bottom:8px;">🎯</div>
+              <strong style="font-size:13px;">Centralize Data</strong>
+              <p style="font-size:11px; color:var(--gray); margin-top:4px; line-height:1.5;">Consolidate scattered Excel files into one unified data model</p>
+            </div>
+            <div class="feature-item">
+              <div style="font-size:26px; margin-bottom:8px;">⚡</div>
+              <strong style="font-size:13px;">Speed Up Reporting</strong>
+              <p style="font-size:11px; color:var(--gray); margin-top:4px; line-height:1.5;">Reduce manual report creation from hours to seconds</p>
+            </div>
+            <div class="feature-item">
+              <div style="font-size:26px; margin-bottom:8px;">🔄</div>
+              <strong style="font-size:13px;">Automate Refresh</strong>
+              <p style="font-size:11px; color:var(--gray); margin-top:4px; line-height:1.5;">Daily/monthly auto-update without manual intervention</p>
+            </div>
+            <div class="feature-item">
+              <div style="font-size:26px; margin-bottom:8px;">📊</div>
+              <strong style="font-size:13px;">Enable Decisions</strong>
+              <p style="font-size:11px; color:var(--gray); margin-top:4px; line-height:1.5;">Provide real-time insights to executives & managers</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bar"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SLIDE 4 — ABOUT MARKETING
+  ════════════════════════════════════════════ -->
+  <div class="slide light" id="s4">
+    <div class="slide-inner">
+      <div class="kicker" style="background:var(--navy); color:white;">Section 02</div>
+      <h2 style="font-size:38px; color:var(--navy);">About <span style="color:var(--blue);">Marketing</span></h2>
+      <div class="divider"></div>
+
+      <div class="grid-2" style="gap:32px; margin-top:8px;">
+        <div class="card-light" style="border-left: 4px solid var(--accent);">
+          <h3 style="font-size:14px; color:var(--navy); text-transform:uppercase; letter-spacing:2px; margin-bottom:14px;">🎯 Our Vision</h3>
+          <p style="font-size:17px; font-weight:600; color:var(--navy); line-height:1.5; margin-bottom:14px;">
+            To be the most data-driven and agile marketing team in the petrochemical distribution sector.
+          </p>
+          <p style="font-size:13px; color:#4A5A8A; line-height:1.7;">
+            We strive to replace intuition-based decisions with evidence-backed strategies — leveraging real-time dashboards, pricing intelligence, and trade flow analytics to gain sustainable competitive advantage.
+          </p>
+        </div>
+        <div class="card-light" style="border-left: 4px solid var(--blue);">
+          <h3 style="font-size:14px; color:var(--navy); text-transform:uppercase; letter-spacing:2px; margin-bottom:14px;">🚀 Our Mission</h3>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <div style="display:flex; gap:10px; align-items:flex-start;">
+              <span style="color:var(--accent); font-weight:700; flex-shrink:0;">01</span>
+              <p style="font-size:13px; color:#4A5A8A; line-height:1.6;">Monitor PTA/PX product performance through automated dashboards to support pricing and volume decisions</p>
+            </div>
+            <div style="display:flex; gap:10px; align-items:flex-start;">
+              <span style="color:var(--accent); font-weight:700; flex-shrink:0;">02</span>
+              <p style="font-size:13px; color:#4A5A8A; line-height:1.6;">Track export-import (EXIM) flows to identify trade opportunities and optimize supply chain efficiency</p>
+            </div>
+            <div style="display:flex; gap:10px; align-items:flex-start;">
+              <span style="color:var(--accent); font-weight:700; flex-shrink:0;">03</span>
+              <p style="font-size:13px; color:#4A5A8A; line-height:1.6;">Deliver daily pricing intelligence to enable rapid market response and competitive positioning</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px; display:flex; gap:16px; flex-wrap:wrap;">
+        <div class="pill" style="background:rgba(10,31,92,0.08); color:var(--navy); border-color:rgba(10,31,92,0.2);">PTA — Purified Terephthalic Acid</div>
+        <div class="pill" style="background:rgba(10,31,92,0.08); color:var(--navy); border-color:rgba(10,31,92,0.2);">PX — Paraxylene</div>
+        <div class="pill" style="background:rgba(10,31,92,0.08); color:var(--navy); border-color:rgba(10,31,92,0.2);">Petrochemical Distribution</div>
+        <div class="pill" style="background:rgba(10,31,92,0.08); color:var(--navy); border-color:rgba(10,31,92,0.2);">Export–Import Analytics</div>
+      </div>
+    </div>
+    <div style="height:4px; background:linear-gradient(90deg, var(--navy) 0%, transparent 100%);"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SLIDE 5 — MY TASKS
+  ════════════════════════════════════════════ -->
+  <div class="slide dark" id="s5">
+    <div class="grid-lines"></div>
+    <div class="slide-inner">
+      <div class="kicker">Section 03</div>
+      <h2 style="font-size:36px; margin-bottom:6px;">My Tasks — <span style="color:var(--accent);">Data Process & BI Analyst</span></h2>
+      <div class="divider"></div>
+
+      <div class="grid-2" style="gap:14px;">
+        <div style="display:flex; flex-direction:column; gap:11px;">
+          <div style="display:flex; gap:14px; align-items:flex-start; padding:14px 18px; background:var(--bg-card); border-radius:12px; border-left:3px solid #4A90D9;">
+            <span style="font-size:22px; flex-shrink:0;">📥</span>
+            <div>
+              <strong style="font-size:13px; color:var(--white);">Data Collection & Validation</strong>
+              <p style="font-size:12px; color:var(--gray); margin-top:3px; line-height:1.5;">Gathered raw transactional data from multiple Excel sources; validated for completeness, consistency, and format compliance before loading</p>
+            </div>
+          </div>
+          <div style="display:flex; gap:14px; align-items:flex-start; padding:14px 18px; background:var(--bg-card); border-radius:12px; border-left:3px solid var(--accent);">
+            <span style="font-size:22px; flex-shrink:0;">⚙️</span>
+            <div>
+              <strong style="font-size:13px; color:var(--white);">Data Transformation (Power Query / DAX)</strong>
+              <p style="font-size:12px; color:var(--gray); margin-top:3px; line-height:1.5;">Cleaned and reshaped raw data — unpivoting tables, standardizing date formats, removing duplicates, and writing DAX measures for KPI calculations</p>
+            </div>
+          </div>
+          <div style="display:flex; gap:14px; align-items:flex-start; padding:14px 18px; background:var(--bg-card); border-radius:12px; border-left:3px solid #6EC87A;">
+            <span style="font-size:22px; flex-shrink:0;">🗂️</span>
+            <div>
+              <strong style="font-size:13px; color:var(--white);">Data Modeling & Relationships</strong>
+              <p style="font-size:12px; color:var(--gray); margin-top:3px; line-height:1.5;">Designed star-schema data models connecting fact tables (sales, shipments, prices) with dimension tables (product, date, region, customer)</p>
+            </div>
+          </div>
+          <div style="display:flex; gap:14px; align-items:flex-start; padding:14px 18px; background:var(--bg-card); border-radius:12px; border-left:3px solid #B06CEA;">
+            <span style="font-size:22px; flex-shrink:0;">📊</span>
+            <div>
+              <strong style="font-size:13px; color:var(--white);">Building Automated Dashboards</strong>
+              <p style="font-size:12px; color:var(--gray); margin-top:3px; line-height:1.5;">Developed 3 production dashboards in Power BI: Executive Overview, EXIM, and Daily Pricing Monitor — with scheduled auto-refresh</p>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:11px;">
+          <div style="display:flex; gap:14px; align-items:flex-start; padding:14px 18px; background:var(--bg-card); border-radius:12px; border-left:3px solid #F5A623;">
+            <span style="font-size:22px; flex-shrink:0;">🎨</span>
+            <div>
+              <strong style="font-size:13px; color:var(--white);">Interactive Visualization Design</strong>
+              <p style="font-size:12px; color:var(--gray); margin-top:3px; line-height:1.5;">Designed Deneb custom visuals, trend charts, slicers by product/region/date, and drill-through pages for executive and operational users</p>
+            </div>
+          </div>
+          <div style="display:flex; gap:14px; align-items:flex-start; padding:14px 18px; background:var(--bg-card); border-radius:12px; border-left:3px solid #4A90D9;">
+            <span style="font-size:22px; flex-shrink:0;">✅</span>
+            <div>
+              <strong style="font-size:13px; color:var(--white);">Accuracy Testing & Maintenance</strong>
+              <p style="font-size:12px; color:var(--gray); margin-top:3px; line-height:1.5;">Cross-checked all KPIs against source Excel files; maintained dashboards during data pipeline changes and performed monthly accuracy audits</p>
+            </div>
+          </div>
+          <div style="display:flex; gap:14px; align-items:flex-start; padding:14px 18px; background:var(--bg-card); border-radius:12px; border-left:3px solid #6EC87A;">
+            <span style="font-size:22px; flex-shrink:0;">🤝</span>
+            <div>
+              <strong style="font-size:13px; color:var(--white);">Business User Support & Insights</strong>
+              <p style="font-size:12px; color:var(--gray); margin-top:3px; line-height:1.5;">Presented dashboard findings to marketing and operations teams; translated complex data patterns into actionable business insights</p>
+            </div>
+          </div>
+          <div style="padding:14px 18px; background:rgba(245,166,35,0.1); border-radius:12px; border:1px solid rgba(245,166,35,0.3); text-align:center;">
+            <div style="font-size:11px; color:var(--accent); letter-spacing:2px; text-transform:uppercase; margin-bottom:6px;">Tech Stack</div>
+            <div>
+              <span class="pill">Power BI Desktop</span>
+              <span class="pill">Power Query</span>
+              <span class="pill">DAX</span>
+              <span class="pill">Deneb</span>
+              <span class="pill">Excel</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bar"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SLIDE 6 — BACKGROUND
+  ════════════════════════════════════════════ -->
+  <div class="slide dark" id="s6">
+    <div class="grid-lines"></div>
+    <div class="slide-inner">
+      <div class="kicker">Section 04</div>
+      <h2 style="font-size:36px; margin-bottom:6px;">Background — <span style="color:var(--accent);">Why Build a Power BI Dashboard?</span></h2>
+      <div class="divider"></div>
+
+      <p style="font-size:14px; color:var(--light); max-width:680px; line-height:1.7; margin-bottom:24px;">
+        The marketing team was managing product performance, pricing, and trade data entirely through <strong>manual Excel reports</strong> — a process that was slow, error-prone, and unable to support real-time business decisions.
+      </p>
+
+      <div class="grid-4">
+        <div class="stat-card">
+          <div style="font-size:32px; margin-bottom:8px;">📋</div>
+          <div class="metric-val" style="font-size:26px;">Slow</div>
+          <div class="metric-lbl">Manual Reporting</div>
+          <p style="font-size:11px; color:var(--gray); margin-top:8px; line-height:1.5;">Reports took hours to compile each week from scattered Excel files</p>
+        </div>
+        <div class="stat-card">
+          <div style="font-size:32px; margin-bottom:8px;">⚠️</div>
+          <div class="metric-val" style="font-size:26px;">High</div>
+          <div class="metric-lbl">Human Error Risk</div>
+          <p style="font-size:11px; color:var(--gray); margin-top:8px; line-height:1.5;">Manual copy-paste operations introduced inconsistencies and mistakes</p>
+        </div>
+        <div class="stat-card">
+          <div style="font-size:32px; margin-bottom:8px;">🔍</div>
+          <div class="metric-val" style="font-size:26px;">Zero</div>
+          <div class="metric-lbl">Real-Time Visibility</div>
+          <p style="font-size:11px; color:var(--gray); margin-top:8px; line-height:1.5;">No live view of pricing, volume, or trade flows for rapid decisions</p>
+        </div>
+        <div class="stat-card">
+          <div style="font-size:32px; margin-bottom:8px;">📂</div>
+          <div class="metric-val" style="font-size:26px;">Silo</div>
+          <div class="metric-lbl">Data Fragmentation</div>
+          <p style="font-size:11px; color:var(--gray); margin-top:8px; line-height:1.5;">Data lived in separate files per person, with no single source of truth</p>
+        </div>
+      </div>
+
+      <div style="margin-top:22px; padding:18px 24px; background:rgba(245,166,35,0.08); border:1px solid rgba(245,166,35,0.3); border-radius:14px; display:flex; align-items:center; gap:20px;">
+        <span style="font-size:32px;">💡</span>
+        <div>
+          <strong style="color:var(--accent);">The Solution:</strong>
+          <span style="color:var(--light); font-size:14px; margin-left:8px;">
+            Build automated Power BI dashboards that centralize data, eliminate manual effort, enable real-time monitoring, and empower every stakeholder with self-service analytics.
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bar"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SLIDE 7 — SMART PROCESS (NEW)
+  ════════════════════════════════════════════ -->
+  <div class="slide light" id="s7">
+    <div class="slide-inner">
+      <div class="kicker" style="background:var(--navy);">Section 05 · New</div>
+      <h2 style="font-size:36px; color:var(--navy);">SMART Process in <span style="color:var(--blue);">Dashboard Development</span></h2>
+      <div class="divider" style="background:linear-gradient(90deg, var(--navy), var(--blue));"></div>
+
+      <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:14px;">
+        <div class="smart-item" style="background:rgba(10,31,92,0.06); border-color:rgba(10,31,92,0.12);">
+          <div class="smart-label" style="color:var(--navy);">S — Specific</div>
+          <strong style="font-size:13px; color:var(--navy); display:block; margin-bottom:6px;">Defined Purpose</strong>
+          <p style="font-size:12px; color:#4A5A8A; line-height:1.6;">Dashboard scope is clearly defined: monitor PTA/PX performance, EXIM trade flows, and daily pricing movements — not generic reporting</p>
+          <div class="smart-letter" style="color:var(--navy);">S</div>
+        </div>
+        <div class="smart-item" style="background:rgba(10,31,92,0.06); border-color:rgba(10,31,92,0.12);">
+          <div class="smart-label" style="color:var(--navy);">M — Measurable</div>
+          <strong style="font-size:13px; color:var(--navy); display:block; margin-bottom:6px;">Clear KPIs</strong>
+          <p style="font-size:12px; color:#4A5A8A; line-height:1.6;">Every dashboard has quantifiable metrics: Value (USD), Quantity (KG), MoM growth %, shipment count, price delta — all tracked over time</p>
+          <div class="smart-letter" style="color:var(--navy);">M</div>
+        </div>
+        <div class="smart-item" style="background:rgba(10,31,92,0.06); border-color:rgba(10,31,92,0.12);">
+          <div class="smart-label" style="color:var(--navy);">A — Achievable</div>
+          <strong style="font-size:13px; color:var(--navy); display:block; margin-bottom:6px;">Data Ready</strong>
+          <p style="font-size:12px; color:#4A5A8A; line-height:1.6;">All data already exists in structured Excel files; Power Query connects and transforms it into a unified model — no new system required</p>
+          <div class="smart-letter" style="color:var(--navy);">A</div>
+        </div>
+        <div class="smart-item" style="background:rgba(10,31,92,0.06); border-color:rgba(10,31,92,0.12);">
+          <div class="smart-label" style="color:var(--navy);">R — Relevant</div>
+          <strong style="font-size:13px; color:var(--navy); display:block; margin-bottom:6px;">Business-Driven</strong>
+          <p style="font-size:12px; color:#4A5A8A; line-height:1.6;">Directly supports marketing, sales, and operations decisions: pricing strategy, supply planning, and trade optimization — not vanity metrics</p>
+          <div class="smart-letter" style="color:var(--navy);">R</div>
+        </div>
+        <div class="smart-item" style="background:rgba(10,31,92,0.06); border-color:rgba(10,31,92,0.12);">
+          <div class="smart-label" style="color:var(--navy);">T — Time-Bound</div>
+          <strong style="font-size:13px; color:var(--navy); display:block; margin-bottom:6px;">Auto-Refresh</strong>
+          <p style="font-size:12px; color:#4A5A8A; line-height:1.6;">Dashboards are configured with scheduled daily/monthly refresh — ensuring data is always current without manual updates</p>
+          <div class="smart-letter" style="color:var(--navy);">T</div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px; padding:16px 22px; background:rgba(10,31,92,0.07); border-radius:12px; border-left:4px solid var(--accent);">
+        <strong style="font-size:13px; color:var(--navy);">Key Insight:</strong>
+        <span style="font-size:13px; color:#4A5A8A; margin-left:8px;">Applying SMART ensured that dashboards were built with clear business intent — not just aesthetically appealing visuals, but truly decision-enabling tools.</span>
+      </div>
+    </div>
+    <div style="height:4px; background:linear-gradient(90deg, var(--navy) 0%, transparent 100%);"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SLIDE 8 — DASHBOARD DEVELOPMENT FLOW (NEW)
+  ════════════════════════════════════════════ -->
+  <div class="slide dark" id="s8">
+    <div class="grid-lines"></div>
+    <div class="slide-inner">
+      <div class="kicker">Section 06 · New</div>
+      <h2 style="font-size:36px; margin-bottom:20px;">Dashboard <span style="color:var(--accent);">Development Flow</span></h2>
+
+      <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:10px;">
+        <!-- Steps -->
+        <div style="text-align:center; display:flex; flex-direction:column; align-items:center; gap:10px;">
+          <div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--gold));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:var(--navy);">1</div>
+          <div style="height:2px;width:100%;background:var(--border);position:relative;top:-27px;z-index:-1;"></div>
+          <div style="padding:14px 10px; background:var(--bg-card); border-radius:12px; border:1px solid var(--border); width:100%;">
+            <div style="font-size:22px; margin-bottom:6px;">🏢</div>
+            <strong style="font-size:11px; display:block; margin-bottom:5px; color:var(--accent);">Business Understanding</strong>
+            <p style="font-size:10px; color:var(--gray); line-height:1.5;">Align with stakeholders on goals, KPIs, and user needs</p>
+          </div>
+        </div>
+        <div style="text-align:center; display:flex; flex-direction:column; align-items:center; gap:10px;">
+          <div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--gold));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:var(--navy);">2</div>
+          <div style="padding:14px 10px; background:var(--bg-card); border-radius:12px; border:1px solid var(--border); width:100%;">
+            <div style="font-size:22px; margin-bottom:6px;">📂</div>
+            <strong style="font-size:11px; display:block; margin-bottom:5px; color:var(--accent);">Data Collection</strong>
+            <p style="font-size:10px; color:var(--gray); line-height:1.5;">Standardize Excel templates; identify all data sources</p>
+          </div>
+        </div>
+        <div style="text-align:center; display:flex; flex-direction:column; align-items:center; gap:10px;">
+          <div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--gold));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:var(--navy);">3</div>
+          <div style="padding:14px 10px; background:var(--bg-card); border-radius:12px; border:1px solid var(--border); width:100%;">
+            <div style="font-size:22px; margin-bottom:6px;">🔧</div>
+            <strong style="font-size:11px; display:block; margin-bottom:5px; color:var(--accent);">Data Cleaning</strong>
+            <p style="font-size:10px; color:var(--gray); line-height:1.5;">Power Query: remove duplicates, fix formats, handle nulls</p>
+          </div>
+        </div>
+        <div style="text-align:center; display:flex; flex-direction:column; align-items:center; gap:10px;">
+          <div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--gold));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:var(--navy);">4</div>
+          <div style="padding:14px 10px; background:var(--bg-card); border-radius:12px; border:1px solid var(--border); width:100%;">
+            <div style="font-size:22px; margin-bottom:6px;">🗂️</div>
+            <strong style="font-size:11px; display:block; margin-bottom:5px; color:var(--accent);">Data Modeling</strong>
+            <p style="font-size:10px; color:var(--gray); line-height:1.5;">Build star schema; create DAX measures and calculated columns</p>
+          </div>
+        </div>
+        <div style="text-align:center; display:flex; flex-direction:column; align-items:center; gap:10px;">
+          <div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--gold));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:var(--navy);">5</div>
+          <div style="padding:14px 10px; background:var(--bg-card); border-radius:12px; border:1px solid var(--border); width:100%;">
+            <div style="font-size:22px; margin-bottom:6px;">🎨</div>
+            <strong style="font-size:11px; display:block; margin-bottom:5px; color:var(--accent);">Visualization</strong>
+            <p style="font-size:10px; color:var(--gray); line-height:1.5;">Design interactive charts, slicers, Deneb visuals per user role</p>
+          </div>
+        </div>
+        <div style="text-align:center; display:flex; flex-direction:column; align-items:center; gap:10px;">
+          <div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--gold));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:var(--navy);">6</div>
+          <div style="padding:14px 10px; background:var(--bg-card); border-radius:12px; border:1px solid var(--border); width:100%;">
+            <div style="font-size:22px; margin-bottom:6px;">🔄</div>
+            <strong style="font-size:11px; display:block; margin-bottom:5px; color:var(--accent);">Automation</strong>
+            <p style="font-size:10px; color:var(--gray); line-height:1.5;">Configure scheduled refresh; publish to Power BI Service</p>
+          </div>
+        </div>
+        <div style="text-align:center; display:flex; flex-direction:column; align-items:center; gap:10px;">
+          <div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--gold));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:var(--navy);">7</div>
+          <div style="padding:14px 10px; background:var(--bg-card); border-radius:12px; border:1px solid var(--border); width:100%;">
+            <div style="font-size:22px; margin-bottom:6px;">✅</div>
+            <strong style="font-size:11px; display:block; margin-bottom:5px; color:var(--accent);">Testing & UAT</strong>
+            <p style="font-size:10px; color:var(--gray); line-height:1.5;">Validate against source data; gather user feedback; iterate</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px; display:flex; gap:14px;">
+        <div style="flex:1; padding:14px 18px; background:rgba(245,166,35,0.08); border-radius:12px; border:1px solid rgba(245,166,35,0.2); font-size:12px; color:var(--light); line-height:1.6;">
+          <strong style="color:var(--accent);">⏱ Timeline:</strong> Each dashboard cycle (Steps 1–7) takes approximately 2–3 weeks, with ongoing maintenance thereafter.
+        </div>
+        <div style="flex:1; padding:14px 18px; background:rgba(255,255,255,0.05); border-radius:12px; border:1px solid var(--border); font-size:12px; color:var(--light); line-height:1.6;">
+          <strong style="color:var(--accent);">🔑 Key Tool at Each Step:</strong> Excel → Power Query → DAX → Deneb → Power BI Service
+        </div>
+      </div>
+    </div>
+    <div class="footer-bar"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SLIDE 9 — EXECUTIVE DASHBOARD
+  ════════════════════════════════════════════ -->
+  <div class="slide light" id="s9">
+    <div class="slide-inner">
+      <div class="kicker" style="background:var(--navy);">Section 07A · Dashboard Deep-Dive</div>
+      <h2 style="font-size:34px; color:var(--navy);">Executive Overall Dashboard <span style="color:var(--blue);">(PTA / PX)</span></h2>
+      <div class="divider" style="background:linear-gradient(90deg, var(--navy), var(--blue));"></div>
+
+      <div class="grid-2" style="gap:24px;">
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div class="card-light">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+              <span style="font-size:22px;">🎯</span>
+              <strong style="font-size:13px; color:var(--navy); text-transform:uppercase; letter-spacing:1px;">Objective</strong>
+            </div>
+            <p style="font-size:13px; color:#4A5A8A; line-height:1.7;">Provide C-level and senior management with a high-level, at-a-glance view of PTA and PX product performance — enabling quick identification of growth trends, underperformance, and strategic opportunities without diving into raw data.</p>
+          </div>
+          <div class="card-light">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+              <span style="font-size:22px;">📊</span>
+              <strong style="font-size:13px; color:var(--navy); text-transform:uppercase; letter-spacing:1px;">Key Metrics</strong>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+              <div style="padding:10px; background:rgba(10,31,92,0.05); border-radius:8px; text-align:center;">
+                <div style="font-size:20px; font-weight:800; color:var(--navy); font-family:'Syne',sans-serif;">Value</div>
+                <div style="font-size:11px; color:#6A7A9A;">USD (Monthly / YTD)</div>
+              </div>
+              <div style="padding:10px; background:rgba(10,31,92,0.05); border-radius:8px; text-align:center;">
+                <div style="font-size:20px; font-weight:800; color:var(--navy); font-family:'Syne',sans-serif;">Volume</div>
+                <div style="font-size:11px; color:#6A7A9A;">KG Quantity Shipped</div>
+              </div>
+              <div style="padding:10px; background:rgba(10,31,92,0.05); border-radius:8px; text-align:center;">
+                <div style="font-size:20px; font-weight:800; color:var(--navy); font-family:'Syne',sans-serif;">MoM %</div>
+                <div style="font-size:11px; color:#6A7A9A;">Month-on-Month Growth</div>
+              </div>
+              <div style="padding:10px; background:rgba(10,31,92,0.05); border-radius:8px; text-align:center;">
+                <div style="font-size:20px; font-weight:800; color:var(--navy); font-family:'Syne',sans-serif;">YoY</div>
+                <div style="font-size:11px; color:#6A7A9A;">Year-on-Year Comparison</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div class="card-light">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+              <span style="font-size:22px;">🖥️</span>
+              <strong style="font-size:13px; color:var(--navy); text-transform:uppercase; letter-spacing:1px;">Visual Approach</strong>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <div style="display:flex; gap:8px; align-items:center; font-size:12px; color:#4A5A8A;"><span style="color:var(--accent);">▶</span> KPI summary cards (Value USD, Qty KG, Growth %)</div>
+              <div style="display:flex; gap:8px; align-items:center; font-size:12px; color:#4A5A8A;"><span style="color:var(--accent);">▶</span> Multi-year trend line chart (2021–2025)</div>
+              <div style="display:flex; gap:8px; align-items:center; font-size:12px; color:#4A5A8A;"><span style="color:var(--accent);">▶</span> Product split bar chart (PTA vs PX)</div>
+              <div style="display:flex; gap:8px; align-items:center; font-size:12px; color:#4A5A8A;"><span style="color:var(--accent);">▶</span> Month/Year slicers for time filtering</div>
+              <div style="display:flex; gap:8px; align-items:center; font-size:12px; color:#4A5A8A;"><span style="color:var(--accent);">▶</span> Drill-through to product detail page</div>
+            </div>
+          </div>
+          <div style="padding:16px 20px; background:rgba(10,31,92,0.06); border-radius:12px; border-left:4px solid var(--accent);">
+            <strong style="font-size:12px; color:var(--navy); text-transform:uppercase; letter-spacing:1px;">💼 Business Value</strong>
+            <p style="font-size:13px; color:#4A5A8A; margin-top:8px; line-height:1.7;">Replaces a 2-hour weekly manual Excel report with a live dashboard refreshed daily — giving executives immediate answers to "How are we performing?" without waiting for analyst reports.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="height:4px; background:linear-gradient(90deg, var(--navy) 0%, transparent 100%);"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SLIDE 10 — EXIM DASHBOARD
+  ════════════════════════════════════════════ -->
+  <div class="slide dark" id="s10">
+    <div class="grid-lines"></div>
+    <div class="slide-inner">
+      <div class="kicker">Section 07B · Dashboard Deep-Dive</div>
+      <h2 style="font-size:34px; margin-bottom:6px;">EXIM Dashboard — <span style="color:var(--accent);">Export & Import Analytics</span></h2>
+      <div class="divider"></div>
+
+      <div class="grid-2" style="gap:24px;">
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div class="card">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+              <span style="font-size:22px;">🚢</span>
+              <strong style="font-size:13px; color:var(--accent); text-transform:uppercase; letter-spacing:1px;">Objective</strong>
+            </div>
+            <p style="font-size:13px; color:var(--light); line-height:1.7;">Monitor and analyze international export and import activities for PTA/PX — providing a clear picture of trade flows, destination markets, shipment volumes, and transaction values over time.</p>
+          </div>
+          <div class="card">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+              <span style="font-size:22px;">📦</span>
+              <strong style="font-size:13px; color:var(--accent); text-transform:uppercase; letter-spacing:1px;">Key Metrics</strong>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+              <div style="padding:10px; background:rgba(255,255,255,0.05); border-radius:8px; text-align:center;">
+                <div style="font-size:18px; font-weight:800; color:var(--accent); font-family:'Syne',sans-serif;">Shipment<br>Volume</div>
+                <div style="font-size:11px; color:var(--gray);">KG per Destination</div>
+              </div>
+              <div style="padding:10px; background:rgba(255,255,255,0.05); border-radius:8px; text-align:center;">
+                <div style="font-size:18px; font-weight:800; color:var(--accent); font-family:'Syne',sans-serif;">Trade<br>Value</div>
+                <div style="font-size:11px; color:var(--gray);">USD per Period</div>
+              </div>
+              <div style="padding:10px; background:rgba(255,255,255,0.05); border-radius:8px; text-align:center;">
+                <div style="font-size:18px; font-weight:800; color:var(--accent); font-family:'Syne',sans-serif;">Country<br>Split</div>
+                <div style="font-size:11px; color:var(--gray);">Export vs Import Origin</div>
+              </div>
+              <div style="padding:10px; background:rgba(255,255,255,0.05); border-radius:8px; text-align:center;">
+                <div style="font-size:18px; font-weight:800; color:var(--accent); font-family:'Syne',sans-serif;">Monthly<br>Trend</div>
+                <div style="font-size:11px; color:var(--gray);">Seasonal Patterns</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div class="card">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+              <span style="font-size:22px;">🗺️</span>
+              <strong style="font-size:13px; color:var(--accent); text-transform:uppercase; letter-spacing:1px;">Key Visuals</strong>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <div style="display:flex; gap:8px; align-items:center; font-size:12px; color:var(--light);"><span style="color:var(--accent);">▶</span> Choropleth map showing export/import by country</div>
+              <div style="display:flex; gap:8px; align-items:center; font-size:12px; color:var(--light);"><span style="color:var(--accent);">▶</span> Stacked bar chart: Export volume vs Import volume</div>
+              <div style="display:flex; gap:8px; align-items:center; font-size:12px; color:var(--light);"><span style="color:var(--accent);">▶</span> Time-series trend with MoM change annotations</div>
+              <div style="display:flex; gap:8px; align-items:center; font-size:12px; color:var(--light);"><span style="color:var(--accent);">▶</span> Top-5 trade partner ranking table</div>
+              <div style="display:flex; gap:8px; align-items:center; font-size:12px; color:var(--light);"><span style="color:var(--accent);">▶</span> Product/Country cross-filter slicer</div>
+            </div>
+          </div>
+          <div style="padding:16px 20px; background:rgba(245,166,35,0.08); border-radius:12px; border-left:4px solid var(--accent);">
+            <strong style="font-size:12px; color:var(--accent); text-transform:uppercase; letter-spacing:1px;">💼 Business Value</strong>
+            <p style="font-size:13px; color:var(--light); margin-top:8px; line-height:1.7;">Enables logistics and commercial teams to immediately identify which markets are growing, where to allocate supply, and spot unusual trade patterns that signal market risks or new opportunities.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bar"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SLIDE 11 — DAILY PRICING DASHBOARD
+  ════════════════════════════════════════════ -->
+  <div class="slide light" id="s11">
+    <div class="slide-inner">
+      <div class="kicker" style="background:var(--navy);">Section 07C · Dashboard Deep-Dive</div>
+      <h2 style="font-size:34px; color:var(--navy);">Daily Pricing Monitor <span style="color:var(--blue);">Dashboard</span></h2>
+      <div class="divider" style="background:linear-gradient(90deg, var(--navy), var(--blue));"></div>
+
+      <div class="grid-2" style="gap:24px;">
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div class="card-light">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+              <span style="font-size:22px;">💹</span>
+              <strong style="font-size:13px; color:var(--navy); text-transform:uppercase; letter-spacing:1px;">Objective</strong>
+            </div>
+            <p style="font-size:13px; color:#4A5A8A; line-height:1.7;">Track daily market price movements for PTA and PX, enabling the commercial team to react swiftly to price fluctuations, benchmark against historical trends, and adjust pricing strategies before competitors.</p>
+          </div>
+          <div class="card-light">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+              <span style="font-size:22px;">⚡</span>
+              <strong style="font-size:13px; color:var(--navy); text-transform:uppercase; letter-spacing:1px;">Why This Matters</strong>
+            </div>
+            <p style="font-size:13px; color:#4A5A8A; line-height:1.7;">Petrochemical prices are highly volatile and influenced by crude oil, currency rates, and global demand. Without a real-time pricing view, teams risk quoting stale prices — losing margin or missing deals. This dashboard solves that directly.</p>
+          </div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div class="card-light">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+              <span style="font-size:22px;">🖥️</span>
+              <strong style="font-size:13px; color:var(--navy); text-transform:uppercase; letter-spacing:1px;">Key Features</strong>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <div style="display:flex; gap:8px; align-items:center; font-size:12px; color:#4A5A8A;"><span style="color:var(--accent);">▶</span> Daily price trend line (PTA & PX — last 30/90 days)</div>
+              <div style="display:flex; gap:8px; align-items:center; font-size:12px; color:#4A5A8A;"><span style="color:var(--accent);">▶</span> Day-over-day price change (△ USD/MT with color coding)</div>
+              <div style="display:flex; gap:8px; align-items:center; font-size:12px; color:#4A5A8A;"><span style="color:var(--accent);">▶</span> Historical average comparison band</div>
+              <div style="display:flex; gap:8px; align-items:center; font-size:12px; color:#4A5A8A;"><span style="color:var(--accent);">▶</span> Price alert indicators (above/below threshold)</div>
+              <div style="display:flex; gap:8px; align-items:center; font-size:12px; color:#4A5A8A;"><span style="color:var(--accent);">▶</span> Rolling 7-day / 30-day moving average</div>
+            </div>
+          </div>
+          <div style="padding:16px 20px; background:rgba(10,31,92,0.06); border-radius:12px; border-left:4px solid var(--accent);">
+            <strong style="font-size:12px; color:var(--navy); text-transform:uppercase; letter-spacing:1px;">💼 Business Value</strong>
+            <p style="font-size:13px; color:#4A5A8A; margin-top:8px; line-height:1.7;">Transforms a daily manual price-check process into a single-click view — ensuring sales, procurement, and marketing teams are always working from the latest market data, reducing pricing risk and improving response time.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="height:4px; background:linear-gradient(90deg, var(--navy) 0%, transparent 100%);"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SLIDE 12 — CHALLENGE & RESPONSE
+  ════════════════════════════════════════════ -->
+  <div class="slide light" id="s12">
+    <div class="slide-inner">
+      <div class="kicker" style="background:var(--navy);">Section 10</div>
+      <h2 style="font-size:36px; color:var(--navy);">Challenge <span style="color:var(--blue);">&</span> Response</h2>
+      <div class="divider" style="background:linear-gradient(90deg, var(--navy), var(--blue));"></div>
+
+      <div class="grid-2" style="gap:28px;">
+        <!-- Challenges -->
+        <div>
+          <h3 style="font-size:13px; color:#C0392B; text-transform:uppercase; letter-spacing:2px; margin-bottom:14px;">⚠️ Challenges Faced</h3>
+          <div style="display:flex; gap:12px; align-items:flex-start; padding:14px 16px; border-radius:12px; background:rgba(200,50,50,0.06); border:1px solid rgba(200,50,50,0.15); margin-bottom:10px;">
+            <span style="font-size:20px;">📋</span>
+            <div>
+              <strong style="font-size:13px; color:var(--navy);">Inconsistent Data Formats</strong>
+              <p style="font-size:12px; color:#4A5A8A; margin-top:3px; line-height:1.5;">Different teams used different date formats, column naming conventions, and unit representations across Excel files, making consolidation impossible without manual fixing.</p>
+            </div>
+          </div>
+          <div style="display:flex; gap:12px; align-items:flex-start; padding:14px 16px; border-radius:12px; background:rgba(200,50,50,0.06); border:1px solid rgba(200,50,50,0.15); margin-bottom:10px;">
+            <span style="font-size:20px;">🕐</span>
+            <div>
+              <strong style="font-size:13px; color:var(--navy);">Manual Reporting Inefficiency</strong>
+              <p style="font-size:12px; color:#4A5A8A; margin-top:3px; line-height:1.5;">Weekly performance reports required 2–4 hours of manual compilation — prone to errors and always one step behind current business reality.</p>
+            </div>
+          </div>
+          <div style="display:flex; gap:12px; align-items:flex-start; padding:14px 16px; border-radius:12px; background:rgba(200,50,50,0.06); border:1px solid rgba(200,50,50,0.15);">
+            <span style="font-size:20px;">🔁</span>
+            <div>
+              <strong style="font-size:13px; color:var(--navy);">Data Duplication & Silos</strong>
+              <p style="font-size:12px; color:#4A5A8A; margin-top:3px; line-height:1.5;">Multiple versions of the same data existed across departments, causing confusion and contradicting reports — leading to distrust in numbers.</p>
+            </div>
+          </div>
+        </div>
+        <!-- Responses -->
+        <div>
+          <h3 style="font-size:13px; color:#27AE60; text-transform:uppercase; letter-spacing:2px; margin-bottom:14px;">✅ How We Responded</h3>
+          <div style="display:flex; gap:12px; align-items:flex-start; padding:14px 16px; border-radius:12px; background:rgba(39,174,96,0.06); border:1px solid rgba(39,174,96,0.2); margin-bottom:10px;">
+            <span style="font-size:20px;">📐</span>
+            <div>
+              <strong style="font-size:13px; color:var(--navy);">Standardized Excel Input Templates</strong>
+              <p style="font-size:12px; color:#4A5A8A; margin-top:3px; line-height:1.5;">Designed locked input templates with data validation rules, standardized column headers, and enforced date/unit formats — eliminating format inconsistency at the source.</p>
+            </div>
+          </div>
+          <div style="display:flex; gap:12px; align-items:flex-start; padding:14px 16px; border-radius:12px; background:rgba(39,174,96,0.06); border:1px solid rgba(39,174,96,0.2); margin-bottom:10px;">
+            <span style="font-size:20px;">⚡</span>
+            <div>
+              <strong style="font-size:13px; color:var(--navy);">Automated Power BI Dashboards</strong>
+              <p style="font-size:12px; color:#4A5A8A; margin-top:3px; line-height:1.5;">Replaced manual Excel reports with automated dashboards that refresh daily — reducing reporting effort from hours to zero while improving accuracy and timeliness.</p>
+            </div>
+          </div>
+          <div style="display:flex; gap:12px; align-items:flex-start; padding:14px 16px; border-radius:12px; background:rgba(39,174,96,0.06); border:1px solid rgba(39,174,96,0.2);">
+            <span style="font-size:20px;">🔧</span>
+            <div>
+              <strong style="font-size:13px; color:var(--navy);">Power Query Data Cleaning Logic</strong>
+              <p style="font-size:12px; color:#4A5A8A; margin-top:3px; line-height:1.5;">Built reusable Power Query scripts to detect and flag duplicates, normalize formats, and merge data from all sources into a single verified master dataset.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="height:4px; background:linear-gradient(90deg, var(--navy) 0%, transparent 100%);"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SLIDE 13 — TARGET & PLAN
+  ════════════════════════════════════════════ -->
+  <div class="slide dark" id="s13">
+    <div class="grid-lines"></div>
+    <div class="slide-inner">
+      <div class="kicker">Section 11</div>
+      <h2 style="font-size:36px; margin-bottom:6px;">Target & <span style="color:var(--accent);">Plan</span></h2>
+      <div class="divider"></div>
+
+      <div class="grid-2" style="gap:32px;">
+        <div>
+          <h3 style="font-size:13px; color:var(--accent); text-transform:uppercase; letter-spacing:2px; margin-bottom:18px;">📅 Roadmap</h3>
+          <div class="timeline">
+            <div class="t-item">
+              <div class="t-dot"></div>
+              <div class="t-year">Phase 1 — Months 1–2</div>
+              <div style="padding:12px 16px; background:var(--bg-card); border-radius:10px;">
+                <strong style="font-size:13px;">Foundation & Data Standardization</strong>
+                <p style="font-size:12px; color:var(--gray); margin-top:4px; line-height:1.5;">Audit all existing Excel files, create standardized input templates, establish data dictionary, and set up Power BI workspace</p>
+              </div>
+            </div>
+            <div class="t-item">
+              <div class="t-dot"></div>
+              <div class="t-year">Phase 2 — Months 3–4</div>
+              <div style="padding:12px 16px; background:var(--bg-card); border-radius:10px;">
+                <strong style="font-size:13px;">Dashboard Build & Testing</strong>
+                <p style="font-size:12px; color:var(--gray); margin-top:4px; line-height:1.5;">Develop Executive, EXIM, and Pricing dashboards; run UAT with stakeholders; fix issues and validate all KPIs</p>
+              </div>
+            </div>
+            <div class="t-item" style="margin-bottom:0;">
+              <div class="t-dot"></div>
+              <div class="t-year">Phase 3 — Month 5 onwards</div>
+              <div style="padding:12px 16px; background:var(--bg-card); border-radius:10px;">
+                <strong style="font-size:13px;">Automation, Training & Expansion</strong>
+                <p style="font-size:12px; color:var(--gray); margin-top:4px; line-height:1.5;">Deploy automated refresh; train end-users; expand to additional product lines and business functions as required</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <h3 style="font-size:13px; color:var(--accent); text-transform:uppercase; letter-spacing:2px; margin-bottom:18px;">🎯 Success Targets</h3>
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            <div style="padding:16px 20px; background:var(--bg-card); border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <strong style="font-size:13px;">Reporting Time Reduction</strong>
+                <p style="font-size:11px; color:var(--gray); margin-top:2px;">From manual weekly Excel → automated daily refresh</p>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-family:'Syne',sans-serif; font-weight:800; font-size:24px; color:var(--accent);">-90%</div>
+              </div>
+            </div>
+            <div style="padding:16px 20px; background:var(--bg-card); border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <strong style="font-size:13px;">Data Accuracy Improvement</strong>
+                <p style="font-size:11px; color:var(--gray); margin-top:2px;">Validated KPIs vs source after full QA cycle</p>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-family:'Syne',sans-serif; font-weight:800; font-size:24px; color:var(--accent);">99%+</div>
+              </div>
+            </div>
+            <div style="padding:16px 20px; background:var(--bg-card); border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <strong style="font-size:13px;">Dashboards Delivered</strong>
+                <p style="font-size:11px; color:var(--gray); margin-top:2px;">Executive, EXIM, Daily Pricing</p>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-family:'Syne',sans-serif; font-weight:800; font-size:24px; color:var(--accent);">3</div>
+              </div>
+            </div>
+            <div style="padding:16px 20px; background:var(--bg-card); border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <strong style="font-size:13px;">Stakeholders Trained</strong>
+                <p style="font-size:11px; color:var(--gray); margin-top:2px;">Marketing, Sales, Operations, Management</p>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-family:'Syne',sans-serif; font-weight:800; font-size:24px; color:var(--accent);">10+</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bar"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SLIDE 14 — RECOMMENDATION
+  ════════════════════════════════════════════ -->
+  <div class="slide dark" id="s14">
+    <div class="grid-lines"></div>
+    <div class="slide-inner">
+      <div class="kicker">Section 12</div>
+      <h2 style="font-size:36px; margin-bottom:6px;"><span style="color:var(--accent);">Recommendations</span> — Next Steps</h2>
+      <div class="divider"></div>
+
+      <div class="grid-2" style="gap:20px;">
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div class="card" style="border-top: 3px solid var(--accent);">
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+              <div style="width:36px;height:36px;border-radius:10px;background:rgba(245,166,35,0.15);display:flex;align-items:center;justify-content:center;font-size:18px;">🔌</div>
+              <strong style="font-size:14px; color:var(--accent);">Integrate Live Data Sources</strong>
+            </div>
+            <p style="font-size:13px; color:var(--light); line-height:1.7;">Connect Power BI directly to ERP/SAP or database systems to eliminate the manual Excel upload step entirely — enabling true real-time data with zero latency.</p>
+          </div>
+          <div class="card" style="border-top: 3px solid #4A90D9;">
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+              <div style="width:36px;height:36px;border-radius:10px;background:rgba(74,144,217,0.15);display:flex;align-items:center;justify-content:center;font-size:18px;">📱</div>
+              <strong style="font-size:14px; color:#4A90D9;">Mobile Dashboard Access</strong>
+            </div>
+            <p style="font-size:13px; color:var(--light); line-height:1.7;">Publish dashboards to Power BI Mobile so executives can access key metrics anytime, anywhere — ensuring critical decisions are never delayed by being out of office.</p>
+          </div>
+          <div class="card" style="border-top: 3px solid #6EC87A;">
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+              <div style="width:36px;height:36px;border-radius:10px;background:rgba(110,200,122,0.15);display:flex;align-items:center;justify-content:center;font-size:18px;">🔔</div>
+              <strong style="font-size:14px; color:#6EC87A;">Automated Alerts & Notifications</strong>
+            </div>
+            <p style="font-size:13px; color:var(--light); line-height:1.7;">Set up Power BI data-driven alerts to automatically notify stakeholders when pricing, volume, or KPIs breach defined thresholds — enabling proactive response.</p>
+          </div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div class="card" style="border-top: 3px solid #B06CEA;">
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+              <div style="width:36px;height:36px;border-radius:10px;background:rgba(176,108,234,0.15);display:flex;align-items:center;justify-content:center;font-size:18px;">🤖</div>
+              <strong style="font-size:14px; color:#B06CEA;">AI-Powered Forecasting</strong>
+            </div>
+            <p style="font-size:13px; color:var(--light); line-height:1.7;">Leverage Power BI's built-in AI features (Q&A, Key Influencers, Decomposition Tree) or integrate Python/R scripts to provide predictive pricing and demand forecasting.</p>
+          </div>
+          <div class="card" style="border-top: 3px solid var(--accent);">
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+              <div style="width:36px;height:36px;border-radius:10px;background:rgba(245,166,35,0.15);display:flex;align-items:center;justify-content:center;font-size:18px;">📚</div>
+              <strong style="font-size:14px; color:var(--accent);">Data Literacy & Training Program</strong>
+            </div>
+            <p style="font-size:13px; color:var(--light); line-height:1.7;">Roll out a structured training program across marketing and operations — ensuring all users can independently navigate dashboards, apply filters, and extract insights without analyst dependency.</p>
+          </div>
+          <div style="padding:16px 20px; background:rgba(245,166,35,0.08); border-radius:12px; border:1px solid rgba(245,166,35,0.3);">
+            <strong style="font-size:12px; color:var(--accent); text-transform:uppercase; letter-spacing:1px;">🎯 Final Goal</strong>
+            <p style="font-size:13px; color:var(--light); margin-top:8px; line-height:1.7;">Build a fully self-service analytics culture where every team member can answer their own data questions — making the organization faster, smarter, and more competitive.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bar"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       SLIDE 15 — THANK YOU
+  ════════════════════════════════════════════ -->
+  <div class="slide dark center" id="s15">
+    <div class="grid-lines"></div>
+    <div class="circle-deco" style="width:700px;height:700px;left:50%;top:50%;transform:translate(-50%,-50%);background:radial-gradient(circle, rgba(26,58,156,0.5) 0%, transparent 70%); border:1px solid rgba(255,255,255,0.05);"></div>
+    <div class="slide-inner center">
+      <div class="kicker">2026 · Internship Final Project</div>
+      <h1 style="font-size:clamp(48px,7vw,84px); line-height:1.1; margin-bottom:24px;">
+        Thank You<br><span style="color:var(--accent);">For Your Time.</span>
+      </h1>
+      <p style="font-size:16px; color:var(--light); max-width:560px; line-height:1.7; margin-bottom:36px;">
+        We look forward to building a data-driven culture that empowers smarter, faster, and more confident business decisions through the power of automation and analytics.
+      </p>
+      <div style="display:flex; gap:20px; justify-content:center; flex-wrap:wrap; margin-bottom:40px;">
+        <div style="padding:12px 24px; background:var(--bg-card); border:1px solid var(--border); border-radius:12px;">
+          <div style="font-size:11px; color:var(--gray); letter-spacing:1px; text-transform:uppercase;">Presented by</div>
+          <div style="font-size:16px; font-weight:600; color:var(--white); margin-top:4px;">Azhar Amirul Abid</div>
+        </div>
+        <div style="padding:12px 24px; background:var(--bg-card); border:1px solid var(--border); border-radius:12px;">
+          <div style="font-size:11px; color:var(--gray); letter-spacing:1px; text-transform:uppercase;">Role</div>
+          <div style="font-size:16px; font-weight:600; color:var(--white); margin-top:4px;">Data Process / BI Analyst</div>
+        </div>
+        <div style="padding:12px 24px; background:var(--bg-card); border:1px solid var(--border); border-radius:12px;">
+          <div style="font-size:11px; color:var(--gray); letter-spacing:1px; text-transform:uppercase;">Year</div>
+          <div style="font-size:16px; font-weight:600; color:var(--accent); margin-top:4px;">2026</div>
+        </div>
+      </div>
+      <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+        <div class="pill">3 Dashboards Delivered</div>
+        <div class="pill">-90% Report Time</div>
+        <div class="pill">Fully Automated</div>
+        <div class="pill">Power BI + DAX + Deneb</div>
+      </div>
+    </div>
+    <div class="footer-bar"></div>
+  </div>
+
+</div><!-- end deck -->
+
+<!-- NAVIGATION -->
+<nav class="nav">
+  <button onclick="go(-1)" title="Previous">&#8592;</button>
+  <div class="dots" id="dots"></div>
+  <span class="counter" id="counter">1 / 15</span>
+  <button onclick="go(1)" title="Next">&#8594;</button>
+</nav>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const dotsEl = document.getElementById('dots');
+  const counterEl = document.getElementById('counter');
+  const progressEl = document.getElementById('progress');
+  let cur = 0;
+  const N = slides.length;
+
+  // Build dots
+  for(let i=0;i<N;i++){
+    const d = document.createElement('div');
+    d.className = 'dot' + (i===0?' on':'');
+    d.onclick = ()=>goTo(i);
+    dotsEl.appendChild(d);
+  }
+
+  function goTo(n){
+    slides[cur].classList.remove('active');
+    cur = (n+N)%N;
+    slides[cur].classList.add('active');
+    document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('on',i===cur));
+    counterEl.textContent = `${cur+1} / ${N}`;
+    progressEl.style.width = `${((cur+1)/N)*100}%`;
+  }
+
+  function go(d){ goTo(cur+d); }
+
+  document.addEventListener('keydown', e=>{
+    if(e.key==='ArrowRight'||e.key==='ArrowDown') go(1);
+    if(e.key==='ArrowLeft'||e.key==='ArrowUp') go(-1);
+  });
+
+  // Touch swipe
+  let tx=0;
+  document.addEventListener('touchstart',e=>tx=e.touches[0].clientX,{passive:true});
+  document.addEventListener('touchend',e=>{
+    const dx=tx-e.changedTouches[0].clientX;
+    if(Math.abs(dx)>50) go(dx>0?1:-1);
+  },{passive:true});
+
+  // Init progress
+  progressEl.style.width = `${(1/N)*100}%`;
+</script>
+</body>
+</html>
